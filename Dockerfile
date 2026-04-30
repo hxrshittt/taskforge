@@ -1,20 +1,19 @@
 FROM php:8.2-apache
 
-# Enable Apache mod_rewrite
+# Enable rewrite
 RUN a2enmod rewrite
 
-# Copy project files to Apache root
+# Set Apache root to /dashboard
+ENV APACHE_DOCUMENT_ROOT /var/www/html/dashboard
+
+# Update Apache config to use new root
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
+# Copy files
 COPY . /var/www/html/
 
-# Set proper permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html
-
-# Allow .htaccess override
-RUN echo "<Directory /var/www/html>
-    AllowOverride All
-    Require all granted
-</Directory>" > /etc/apache2/conf-available/override.conf
-
-RUN a2enconf override
 
 EXPOSE 80
