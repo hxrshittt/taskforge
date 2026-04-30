@@ -1,15 +1,18 @@
 FROM php:8.2-apache
 
-# Enable mod_rewrite (safe)
+# Install mysqli (REQUIRED)
+RUN docker-php-ext-install mysqli
+
+# Enable rewrite
 RUN a2enmod rewrite
 
-# Copy files
+# Copy project
 COPY . /var/www/html/
 
-# Ensure index.php is default
+# Set index.php default
 RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 
-# Fix permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
